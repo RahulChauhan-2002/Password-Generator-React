@@ -8,22 +8,41 @@ function App() {
   const [Password,setPassword]=useState("")
   const passwordRef=useRef(null)
 
-  const passwordGenerator=useCallback(()=>{
-    let pass=""
-    let str="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    if(numbersAllowed) str+="0123456789"
-    if(charactorsAllowed) str+="@#$"
+  const passwordGenerator = useCallback(() => {
+    let password = [];  // Stores password characters
+    let characterPool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";  // Base pool
 
-    for(let i=0;i<length;i++)
-    {
-      pass+=str[Math.floor(Math.random()*str.length)]
+    let numbers = "0123456789";
+    let symbols = "@#$";
+
+    // If numbers are allowed, add one and update pool
+    if (numbersAllowed) {
+        password.push(numbers[Math.floor(Math.random() * numbers.length)]);
+        characterPool += numbers;
     }
-    setPassword(pass)
 
+    // If symbols are allowed, add one and update pool
+    if (charactorsAllowed) {
+        password.push(symbols[Math.floor(Math.random() * symbols.length)]);
+        characterPool += symbols;
+    }
 
-  },[length,numbersAllowed,charactorsAllowed, setPassword])
+    // Fill remaining characters randomly from characterPool
+    while (password.length < length) {
+        password.push(characterPool[Math.floor(Math.random() * characterPool.length)]);
+    }
+
+    // Shuffle the password to ensure randomness
+    password.sort(() => Math.random() - 0.5);
+
+    // Convert array to string and set password
+    setPassword(password.join(""));
+}, [length, numbersAllowed, charactorsAllowed, setPassword]);
+
 
   const copyPassword=useCallback(()=>{
+    passwordRef.current?.select();
+    // passwordRef.current?.setSelectionRange(0,9); for selecting specific range of password
     window.navigator.clipboard.writeText(Password)
   },[Password])
  
